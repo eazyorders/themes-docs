@@ -1,0 +1,8 @@
+{
+  "label": "Sections",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Liquid section templates — the building blocks of every custom theme."
+  }
+}

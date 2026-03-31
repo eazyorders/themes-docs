@@ -1,7 +1,8 @@
 {
-  "label": "Themes",
+  "label": "Old themes",
   "position": 3,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "slug": "/category/themes"
   }
 }
