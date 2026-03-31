@@ -180,48 +180,54 @@ Displays the product name, price, rating, and optional short description.
 
 **File:** `sections/product-description.liquid`
 
-Displays the full product description, typically in an accordion or tab layout. The storefront can optionally inject merchant policy content (shipping, refund, COD policies) into this section.
+Displays the full product description in an accordion item, then renders additional merchant policy items (shipping, refund, COD, etc.) from the `policies` list.
 
 ### Variables
 
-| Variable            | Type   | Description                           |
-| ------------------- | ------ | ------------------------------------- |
-| `description`       | string | Full product description (HTML)       |
-| `description_label` | string | Translated label (e.g. "Description") |
-| `theme_data`        | object | Merchant-configured dynamic settings  |
-
-### Data Attributes
-
-These attributes are **optional** — if present, the storefront will inject Google Merchant policy accordions/tabs into them:
-
-| Attribute              | Element   | Purpose                                   |
-| ---------------------- | --------- | ----------------------------------------- |
-| `data-policies`        | container | Receives full policy accordion/tab markup |
-| `data-policies-nav`    | container | Receives policy tab navigation buttons    |
-| `data-policies-panels` | container | Receives policy tab panel content         |
-
-Use **either** `data-policies` (for a self-contained accordion) **or** both `data-policies-nav` + `data-policies-panels` (for a tabbed layout).
+| Variable            | Type                                                 | Description                            |
+| ------------------- | ---------------------------------------------------- | -------------------------------------- |
+| `description`       | string                                               | Full product description (HTML)        |
+| `description_label` | string                                               | Translated label (e.g. "Description")  |
+| `policies`          | `{ icon: string; title: string; content: string }[]` | Policy rows rendered after description |
+| `theme_data`        | object                                               | Merchant-configured dynamic settings   |
 
 ### Example
 
 ```liquid
-<div class="description-accordion">
+<div class="lq-desc-accordion">
   {% if description != "" %}
-    <div class="desc-item" data-open="true">
-      <button class="desc-toggle" type="button" aria-expanded="true">
+    <div class="lq-desc-item" data-open="true">
+      <button class="lq-desc-toggle" type="button" aria-expanded="true">
         <span>{{ description_label }}</span>
+        <span class="lq-desc-chevron"></span>
       </button>
-      <div class="desc-panel" style="display:block">
-        <div class="desc-content">{{ description }}</div>
+      <div class="lq-desc-panel" style="display:block">
+        <div class="lq-desc-content product_description">
+          <div class="ql-editor leading-10" style="text-align:start" dir="auto">{{ description }}</div>
+        </div>
       </div>
     </div>
   {% endif %}
-  <div data-policies></div>
+
+  {% for policy in policies %}
+    <div class="lq-desc-item">
+      <button class="lq-desc-toggle" type="button" aria-expanded="false">
+        <span class="lq-desc-toggle-label">
+          <img src="{{ policy.icon }}" alt="" class="lq-desc-icon" />
+          <span>{{ policy.title }}</span>
+        </span>
+        <span class="lq-desc-chevron"></span>
+      </button>
+      <div class="lq-desc-panel" style="display:none">
+        <div class="lq-desc-content">{{ policy.content }}</div>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 ```
 
 :::info
-The product description can optionally render **inside the product details area** instead of **below the main product column**, controlled by the `is_description_in_details` flag set in the admin panel.
+The product description can optionally render **inside the product details area** instead of **below the main product column**, controlled by the `is_description_in_details` flag set in the admin panel. Policy/content rendering can be **accordion** or **tabs** based on your preference.
 :::
 
 ---
@@ -250,11 +256,11 @@ A sticky bar at the bottom of the product page with the product thumbnail, price
 
 ### Events
 
-| Event                | Detail | Purpose                               |
-| -------------------- | ------ | ------------------------------------- |
-| `buy-now`            | —      | Triggers the add-to-cart / buy action |
-| `increment-quantity` | —      | Increases quantity by 1               |
-| `decrement-quantity` | —      | Decreases quantity by 1               |
+| Event                | Detail                                |
+| -------------------- | ------------------------------------- |
+| `buy-now`            | Triggers the add-to-cart / buy action |
+| `increment-quantity` | Increases quantity by 1               |
+| `decrement-quantity` | Decreases quantity by 1               |
 
 ### Example
 
