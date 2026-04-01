@@ -12,7 +12,7 @@ Home sections render on the store's homepage. They display the hero slider, cate
 
 **File:** `sections/slider.liquid`
 
-A hero image slider / carousel at the top of the homepage. Each slide is a link with an image, optional mobile image, and alt text.
+A hero image slider / carousel. Each slide uses `image` as the main source and can optionally use `mobile_image` on small screens.
 
 ### Variables
 
@@ -25,47 +25,54 @@ A hero image slider / carousel at the top of the homepage. Each slide is a link 
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `slide.image` | string | Desktop image URL |
-| `slide.mobile_image` | string \| null | Mobile-specific image URL |
-| `slide.url` | string | Link destination |
+| `slide.image` | string | Main image URL (desktop + tablet, and fallback for all sizes) |
+| `slide.mobile_image` | string \| null | Optional mobile image URL used on screens `<= 425px` |
+| `slide.url` | string \| null | Optional link destination |
 | `slide.alt` | string | Alt text for the image |
 
-### Data Attributes
-
-None required.
-
-### Events
-
-None required. Links are automatically intercepted for SPA navigation.
+:::info
+Render an `<a>` element only when `slide.url` is not empty; otherwise render a non-clickable `<div>`.
+Use a `<picture>` element to serve `slide.mobile_image` on small screens and `slide.image` for the rest.
+See example for more details.
+:::
 
 ### Example
 
 ```liquid
-<section class="slider" data-autoplay="5000">
+<section class="slider">
   <div class="slider-track">
     {% for slide in slides %}
-      <a href="{{ slide.url }}"
-         class="slide{% if forloop.first %} active{% endif %}">
-        <picture>
-          {% if slide.mobile_image %}
-            <source media="(max-width: 768px)" srcset="{{ slide.mobile_image }}" />
-          {% endif %}
-          <img
-            src="{{ slide.image }}"
-            alt="{{ slide.alt }}"
-            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-          />
-        </picture>
-      </a>
+      {% if slide.url != blank %}
+        <a href="{{ slide.url }}" class="slide{% if forloop.first %} active{% endif %}">
+          <picture>
+            {% if slide.mobile_image != blank %}
+              <source media="(max-width: 425px)" srcset="{{ slide.mobile_image }}" />
+              <source media="(min-width: 426px)" srcset="{{ slide.image }}" />
+            {% endif %}
+            <img
+              src="{{ slide.image }}"
+              alt="{{ slide.alt | default: "Slide image" }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            />
+          </picture>
+        </a>
+      {% else %}
+        <div class="slide{% if forloop.first %} active{% endif %}">
+          <picture>
+            {% if slide.mobile_image != blank %}
+              <source media="(max-width: 425px)" srcset="{{ slide.mobile_image }}" />
+              <source media="(min-width: 426px)" srcset="{{ slide.image }}" />
+            {% endif %}
+            <img
+              src="{{ slide.image }}"
+              alt="{{ slide.alt | default: "Slide image" }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            />
+          </picture>
+        </div>
+      {% endif %}
     {% endfor %}
   </div>
-
-  {% if slides.size > 1 %}
-    <div class="slider-controls">
-      <button class="slider-prev" aria-label="Previous"></button>
-      <button class="slider-next" aria-label="Next"></button>
-    </div>
-  {% endif %}
 </section>
 ```
 
@@ -95,14 +102,6 @@ A category grid or carousel that links to collection pages.
 | `category.name` | string | Category display name |
 | `category.slug` | string | URL slug |
 | `category.thumb` | string | Category thumbnail image URL |
-
-### Data Attributes
-
-None required.
-
-### Events
-
-None required. Links are automatically intercepted for SPA navigation.
 
 ### Example
 
