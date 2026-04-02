@@ -99,4 +99,4 @@ Each section can also be edited individually through the built-in code editor in
 | [Dynamic Theme Data](./dynamic-theme-data)                                                      | Merchant-configurable settings via `schema.json`                |
 | [Liquid Reference](./liquid-reference)                                                          | Template syntax, filters, and rendering                         |
 | [Layout sections](./sections/layout-sections) · [Product sections](./sections/product-sections) | All 17 section templates with variables, events, and examples   |
-| [Events Reference](./events-reference)                                                          | Custom DOM events and `data-eo` attributes                      |
+| [Events Reference](./events-reference)                                                          | Custom DOM events, link interception, and section data attributes |

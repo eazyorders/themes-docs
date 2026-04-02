@@ -191,7 +191,15 @@ Displays the full product description in an accordion item, then renders additio
 | `policies`          | `{ icon: string; title: string; content: string }[]` | Policy rows rendered after description |
 | `theme_data`        | object                                               | Merchant-configured dynamic settings   |
 
-### Example
+:::info
+The product description can optionally render **inside the product details area** instead of **below the main product column**, controlled by the `is_description_in_details` flag set in the admin panel. Policy/content rendering can be **accordion** or **tabs** based on your preference.
+:::
+
+### Full Example (Accordion)
+
+This is a full example of the **accordion mode** using `product-description.liquid`, `style.css`, and `script.js`.
+
+#### `sections/product-description.liquid`
 
 ```liquid
 <div class="lq-desc-accordion">
@@ -226,9 +234,307 @@ Displays the full product description in an accordion item, then renders additio
 </div>
 ```
 
-:::info
-The product description can optionally render **inside the product details area** instead of **below the main product column**, controlled by the `is_description_in_details` flag set in the admin panel. Policy/content rendering can be **accordion** or **tabs** based on your preference.
-:::
+#### `style.css`
+
+```css
+.lq-desc-accordion {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e1dc;
+}
+
+.lq-desc-item {
+  border-bottom: 1px solid #e5e1dc;
+}
+
+.lq-desc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hd-text, #212a2f);
+  text-align: start;
+}
+
+.lq-desc-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lq-desc-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  opacity: 0.7;
+}
+
+.lq-desc-chevron {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+}
+
+.lq-desc-chevron::before,
+.lq-desc-chevron::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  transition: transform 0.25s ease;
+}
+
+.lq-desc-chevron::before {
+  width: 14px;
+  height: 1.5px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.lq-desc-chevron::after {
+  width: 1.5px;
+  height: 14px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.lq-desc-item[data-open="true"] .lq-desc-chevron::after {
+  transform: translateX(-50%) scaleY(0);
+}
+
+.lq-desc-panel {
+  overflow: hidden;
+}
+
+.lq-desc-content {
+  padding: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #555;
+}
+```
+
+#### `script.js`
+
+```js
+function initDescriptionAccordion() {
+  var accordions = document.querySelectorAll(".lq-desc-accordion");
+
+  for (var i = 0; i < accordions.length; i++) {
+    var accordion = accordions[i];
+    if (accordion.dataset.descInit) continue;
+
+    accordion.dataset.descInit = "1";
+
+    accordion.addEventListener("click", function (event) {
+      var toggle = event.target.closest(".lq-desc-toggle");
+      if (!toggle) return;
+
+      var item = toggle.parentElement;
+      var panel = item && item.querySelector(".lq-desc-panel");
+      if (!panel) return;
+
+      var isOpen = item.getAttribute("data-open") === "true";
+
+      if (isOpen) {
+        item.removeAttribute("data-open");
+        toggle.setAttribute("aria-expanded", "false");
+        panel.style.display = "none";
+      } else {
+        item.setAttribute("data-open", "true");
+        toggle.setAttribute("aria-expanded", "true");
+        panel.style.display = "block";
+      }
+    });
+  }
+}
+
+initDescriptionAccordion();
+```
+
+### Full Example (Tabs)
+
+This is a full example of the **tabs mode** using `product-description.liquid`, `style.css`, and `script.js`.
+
+#### `sections/product-description.liquid`
+
+```liquid
+<div class="lq-desc-tabs">
+  <div class="lq-desc-tab-nav" role="tablist">
+    {% if description != "" %}
+      <button
+        class="lq-desc-tab active"
+        role="tab"
+        aria-selected="true"
+        data-tab="description"
+      >
+        <span>{{ description_label }}</span>
+      </button>
+    {% endif %}
+
+    {% for policy in policies %}
+      <button
+        class="lq-desc-tab"
+        role="tab"
+        aria-selected="false"
+        data-tab="policy-{{ forloop.index0 }}"
+      >
+        <img src="{{ policy.icon }}" alt="" class="lq-desc-icon" />
+        <span>{{ policy.title }}</span>
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="lq-desc-tab-panels">
+    {% if description != "" %}
+      <div class="lq-desc-tab-panel active" data-panel="description">
+        <div class="lq-desc-content product_description">
+          <div class="ql-editor leading-10" style="text-align:start" dir="auto">{{ description }}</div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% for policy in policies %}
+      <div class="lq-desc-tab-panel" data-panel="policy-{{ forloop.index0 }}">
+        <div class="lq-desc-content">{{ policy.content }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+```
+
+#### `style.css`
+
+```css
+.lq-desc-tabs {
+  margin-top: 2.5rem;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.lq-desc-tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e5e1dc;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lq-desc-tab-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.lq-desc-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #999;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.lq-desc-tab .lq-desc-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  opacity: 0.6;
+}
+
+.lq-desc-tab.active,
+.lq-desc-tab:hover {
+  color: var(--hd-text, #212a2f);
+}
+
+.lq-desc-tab.active {
+  border-bottom-color: var(--hd-text, #212a2f);
+}
+
+.lq-desc-tab-panels {
+  padding: 1.5rem;
+}
+
+.lq-desc-tab-panel {
+  display: none;
+}
+
+.lq-desc-tab-panel.active {
+  display: block;
+}
+
+.lq-desc-tab-panel .lq-desc-content {
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #555;
+}
+```
+
+#### `script.js`
+
+```js
+function initDescriptionTabs() {
+  var tabsWrappers = document.querySelectorAll(".lq-desc-tabs");
+
+  for (var i = 0; i < tabsWrappers.length; i++) {
+    var tabsWrapper = tabsWrappers[i];
+    if (tabsWrapper.dataset.tabsInit) continue;
+
+    tabsWrapper.dataset.tabsInit = "1";
+
+    tabsWrapper.addEventListener("click", function (event) {
+      var tab = event.target.closest(".lq-desc-tab");
+      if (!tab) return;
+
+      var tabKey = tab.getAttribute("data-tab");
+      if (!tabKey) return;
+
+      var tabs = tabsWrapper.querySelectorAll(".lq-desc-tab");
+      var panels = tabsWrapper.querySelectorAll(".lq-desc-tab-panel");
+
+      for (var j = 0; j < tabs.length; j++) {
+        tabs[j].classList.remove("active");
+        tabs[j].setAttribute("aria-selected", "false");
+      }
+
+      for (var k = 0; k < panels.length; k++) {
+        panels[k].classList.remove("active");
+      }
+
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+
+      var activePanel = tabsWrapper.querySelector('[data-panel="' + tabKey + '"]');
+      if (activePanel) activePanel.classList.add("active");
+    });
+  }
+}
+
+initDescriptionTabs();
+```
 
 ---
 
