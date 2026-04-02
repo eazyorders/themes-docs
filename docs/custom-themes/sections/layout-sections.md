@@ -1,10 +1,10 @@
 ---
-## sidebar_position: 1
+sidebar_position: 1
+---
 
 # Layout Sections
 
 Layout sections define the persistent shell of your store — the header and footer that appear across multiple pages.
----
 
 ## Header
 
