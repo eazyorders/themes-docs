@@ -10,44 +10,51 @@ Layout sections define the persistent shell of your store — the header and foo
 
 **File:** `sections/header.liquid`
 
-The header HTML is rendered **server-side** on first load (`header_html`) for fast paint. The storefront injects that HTML into the page and wires **element IDs** (cart count and language controls below), **CSS class selectors** (theme styling and `lang-click` targeting via `lang-btn`), **bubbling `CustomEvent`s**, and **client-side link interception** for internal routes (for example `/search`, `/collections/...`).
+The header HTML is rendered **server-side** on first load (`header_html`) for fast paint. The storefront injects that HTML into the page and wires **element IDs** (cart count and language controls below, **CSS class selectors** (theme styling and `lang-click` targeting via `lang-btn`; optional `register-btn` for registration), **bubbling `CustomEvents`**, and **client-side link interception** for internal routes (for example `/search`, `/collections/...`).
 
 ### Variables
 
-| Variable              | Type   | Description                                                                                                                    |
-| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `logo`                | string | Store logo image URL                                                                                                           |
-| `store_name`          | string | Store name (fallback when no logo)                                                                                             |
-| `categories`          | array  | Nav items: each item has `name`, `url`, and optional `children[]` (each child: `name`, `url`)                                  |
-| `announcement_config` | object | Announcement bar from merchant theme settings: `text` is `string[]`, `type` is `"simple"`, `"slider"`, or `"marquee"`          |
-| `announcement_text`   | string | Fallback single-line announcement when config is not used                                                                      |
-| `cart_count`          | number | Cart item count at SSR time; should match the initial `#header-cart-count` text and `hidden` state (client keeps them in sync) |
-| `theme_data`          | object | Merchant-configured dynamic settings from `schema.json`                                                                        |
+| Variable              | Type    | Description                                                                                                                    |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `logo`                | string  | Store logo image URL                                                                                                           |
+| `store_name`          | string  | Store name (fallback when no logo)                                                                                             |
+| `categories`          | array   | Nav items: each item has `name`, `url`, and optional `children[]` (each child: `name`, `url`)                                  |
+| `announcement_config` | object  | Announcement bar from merchant theme settings: `text` is `string[]`, `type` is `"simple"`, `"slider"`, or `"marquee"`          |
+| `announcement_text`   | string  | Fallback single-line announcement when config is not used                                                                      |
+| `cart_count`          | number  | Cart item count at SSR time; should match the initial `#header-cart-count` text and `hidden` state (client keeps them in sync) |
+| `is_register_active`  | boolean | When `true`, show a register control and dispatch `register-click`                                                             |
+| `theme_data`          | object  | Merchant-configured dynamic settings from `schema.json`                                                                        |
 
 ### Required element IDs
 
-| ID                                       | Purpose                                                                                                                                                                                                           |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `header-cart-count`                      | Put this **`id`** on the cart badge element (e.g. a `<span>`). The storefront **replaces its text content** with the live cart count and toggles the HTML `hidden` attribute based on whether that count is zero. |
-| `header-lang-btn` , `header-lang-mobile` | Put this **id** on the language control (e.g. a `<button>`) one for desktop and one for mobile. When the Multi-language plugin is **not** active, the storefront sets **`hidden`** attribute on this element.     |
+| ID                                          | Purpose                                                                                                                                                                                                        |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `header-cart-count`                         | Put this `id` on the cart badge element (for example a `span`). The storefront replaces its text content with the live cart count and toggles the HTML `hidden` attribute based on whether that count is zero. |
+| `header-lang-btn`, `header-lang-mobile`     | Put this `id` on the language control (for example `button` elements), one for desktop and one for mobile. When the Multi-language plugin is not active, the storefront sets `hidden` on those elements.       |
+| `header-register`, `header-register-mobile` | Put this `id` on the register control (for example `button` elements), one for desktop and one for mobile. These ids are reserved for a future storefront feature.                                             |
 
-IDs must be **unique** in the document (one cart badge; one desktop language control; at most one mobile language control with `header-lang-mobile`).
+:::note
+Register ids `header-register` and `header-register-mobile` are documented so themes stay consistent ahead of a future storefront feature. Current behavior uses `is_register_active`, `register-btn`, and the `register-click` custom event only.
+:::
+
+IDs must be **unique** in the document (one cart badge; one desktop language control; at most one mobile language control with `header-lang-mobile`; at most one `header-register` and one `header-register-mobile` when you render register controls).
 
 ### Required custom events
 
-Dispatch **bubbling** `CustomEvent`s from the header so they reach the section root where the app listens.
+Dispatch **bubbling** `CustomEvents` from the header so they reach the section root where the app listens.
 
-| Event        | Element          | Purpose                                                                                                                                                                                 |
-| ------------ | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cart-click` | Cart control     | Opens the side cart. Example: `onclick="this.dispatchEvent(new CustomEvent('cart-click',{bubbles:true}))"` on the cart `<button>` (keep class `cart-btn` if your theme CSS targets it). |
-| `lang-click` | Language control | Toggles the language dropdown. Example: `onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"` on the element with class `lang-btn`.                              |
+| Event            | Element          | Purpose                                                                                                                                                                                                                                 |
+| ---------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cart-click`     | Cart control     | Opens the side cart. Example: `onclick="this.dispatchEvent(new CustomEvent('cart-click',{bubbles:true}))"` on the cart `<button>` (keep class `cart-btn` if your theme CSS targets it).                                                 |
+| `lang-click`     | Language control | Toggles the language dropdown. Example: `onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"` on the element with class `lang-btn`.                                                                              |
+| `register-click` | Register control | Navigates to `/register` (client-side). Example: `onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))"` on a `<button>` with class `register-btn`. Only render the control when `is_register_active` is true. |
 
 ### Full example
 
-Below is an end-to-end header (announcement bar, desktop nav, cart/language/search, mobile drawer) with matching **`script.js`** behavior (scroll hide, mobile menu, announcement slider/marquee) and **`style.css`**. Class names are **generic** (no `ab-` prefix); only storefront hooks use fixed names: **`cart-btn`**, **`lang-btn`**, **`search-btn`**, **`id="header-cart-count"`**, and the **`cart-click`** / **`lang-click`** events.
+Below is an end-to-end header (announcement bar, desktop nav, cart/language/search/register, mobile drawer) with matching **`script.js`** behavior (scroll hide, mobile menu, announcement slider/marquee) and **`style.css`**. Class names are **generic** (no `ab-` prefix); only storefront hooks use fixed names: **`cart-btn`**, **`lang-btn`**, **`register-btn`**, **`search-btn`**, **`id="header-cart-count"`**, **`id="header-register"`** / **`id="header-register-mobile"`** (future use; see above), and the **`cart-click`** / **`lang-click`** / **`register-click`** events.
 
 :::warning
-Without event **`cart-click`** on the cart control, the side cart will not open. Without a persistent **`id="header-cart-count"`** badge, the cart count will not stay in sync. Without **`lang-btn`** (and **`lang-click`**), the language UI will not work.
+Without event **`cart-click`** on the cart control, the side cart will not open. Without a persistent **`id="header-cart-count"`** badge, the cart count will not stay in sync. Without **`lang-btn`** (and **`lang-click`**), the language UI will not work. The register control is optional: when `is_register_active` is true, use **`register-click`** on a **`register-btn`** element so the storefront can open registration.
 :::
 
 #### `sections/header.liquid`
@@ -119,6 +126,10 @@ Without event **`cart-click`** on the cart control, the side cart will not open.
     <div class="header-actions">
       <a href="/search" class="header-icon-btn search-btn" aria-label="Search"></a>
 
+      {% if is_register_active %}
+      <button type="button" id="header-register" class="header-icon-btn register-btn" aria-label="Register" onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))"></button>
+      {% endif %}
+
       <button type="button" class="header-icon-btn lang-btn" aria-label="Change Language" onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"></button>
 
       <button type="button" class="header-icon-btn cart-btn" aria-label="Cart" onclick="this.dispatchEvent(new CustomEvent('cart-click',{bubbles:true}))">
@@ -166,6 +177,12 @@ Without event **`cart-click`** on the cart control, the side cart will not open.
       <span>Search</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </a>
+    {% if is_register_active %}
+    <button type="button" id="header-register-mobile" class="register-btn" aria-label="Register" onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))">
+      <span>Register</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    </button>
+    {% endif %}
     <a id="header-lang-mobile" class="lang-btn" onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}));return false;" href="#">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8l4 4-4 4"/></svg>
     </a>
@@ -594,6 +611,12 @@ div:has(> .site-header) > * {
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M2 12h20'/%3E%3Cpath d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M2 12h20'/%3E%3Cpath d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z'/%3E%3C/svg%3E");
 }
+.header-icon-btn.register-btn::before {
+  width: 22px;
+  height: 22px;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cline x1='19' y1='8' x2='19' y2='14'/%3E%3Cline x1='22' y1='11' x2='16' y2='11'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cline x1='19' y1='8' x2='19' y2='14'/%3E%3Cline x1='22' y1='11' x2='16' y2='11'/%3E%3C/svg%3E");
+}
 .cart-badge {
   display: flex;
   align-items: center;
@@ -693,7 +716,8 @@ div:has(> .site-header) > * {
   padding: 8px 0;
 }
 .mobile-nav-accordion-trigger,
-.mobile-nav > a {
+.mobile-nav > a,
+.mobile-nav > button.register-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -718,7 +742,8 @@ div:has(> .site-header) > * {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 .mobile-nav-accordion-trigger svg,
-.mobile-nav > a svg {
+.mobile-nav > a svg,
+.mobile-nav > button.register-btn svg {
   width: 24px;
   height: 24px;
   opacity: 0.5;

@@ -14,19 +14,20 @@ Your Liquid templates dispatch `CustomEvent` instances to communicate user actio
 
 ### Complete Event Table
 
-| Event Name           | Section                       | Detail                                  | Description                                                                              |
-| -------------------- | ----------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `cart-click`         | Header                        | —                                       | Opens the side cart drawer                                                               |
-| `lang-click`         | Header                        | `{ anchor: HTMLElement }` (recommended) | Opens the language switcher dropdown; pass `detail.anchor` as the control that opened it |
-| `footer-subscribe`   | Footer                        | `{ email: string }`                     | Submits newsletter subscription; pass the trimmed address in `detail.email`              |
-| `review-open`        | Reviews                       | —                                       | Opens the review submission modal                                                        |
-| `buy-now`            | Fixed Buy Button              | —                                       | Adds the product to cart / triggers buy flow                                             |
-| `increment-quantity` | Fixed Buy Button              | —                                       | Increases the quantity by 1                                                              |
-| `decrement-quantity` | Fixed Buy Button              | —                                       | Decreases the quantity by 1                                                              |
-| `quick-add`          | Products (featured/list/grid) | `{ productId: string }`                 | Adds a product to cart from the listing                                                  |
-| `quick-view`         | Products (featured/list/grid) | `{ productId: string }`                 | Opens a quick-view modal for a product                                                   |
-| `go-home`            | Thanks                        | —                                       | Navigates to the store homepage                                                          |
-| `copy-tracking-link` | Order Invoice                 | `{ link: string }`                      | Copies the tracking URL to clipboard and shows a toast                                   |
+| Event Name           | Section                       | Detail                                  | Description                                                                                               |
+| -------------------- | ----------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `cart-click`         | Header                        | —                                       | Opens the side cart drawer                                                                                |
+| `lang-click`         | Header                        | `{ anchor: HTMLElement }` (recommended) | Opens the language switcher dropdown; pass `detail.anchor` as the control that opened it                  |
+| `register-click`     | Header                        | —                                       | Navigates to `/register` (client-side). Dispatch from a `register-btn` when `is_register_active` is true. |
+| `footer-subscribe`   | Footer                        | `{ email: string }`                     | Submits newsletter subscription; pass the trimmed address in `detail.email`                               |
+| `review-open`        | Reviews                       | —                                       | Opens the review submission modal                                                                         |
+| `buy-now`            | Fixed Buy Button              | —                                       | Adds the product to cart / triggers buy flow                                                              |
+| `increment-quantity` | Fixed Buy Button              | —                                       | Increases the quantity by 1                                                                               |
+| `decrement-quantity` | Fixed Buy Button              | —                                       | Decreases the quantity by 1                                                                               |
+| `quick-add`          | Products (featured/list/grid) | `{ productId: string }`                 | Adds a product to cart from the listing                                                                   |
+| `quick-view`         | Products (featured/list/grid) | `{ productId: string }`                 | Opens a quick-view modal for a product                                                                    |
+| `go-home`            | Thanks                        | —                                       | Navigates to the store homepage                                                                           |
+| `copy-tracking-link` | Order Invoice                 | `{ link: string }`                      | Copies the tracking URL to clipboard and shows a toast                                                    |
 
 ---
 
@@ -143,6 +144,21 @@ You don't need to do anything special — use standard `<a href="...">` tags and
   onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true,detail:{anchor:this}}))"
 >
   Language
+</button>
+```
+
+### Header — `register-click`
+
+When the header receives `is_register_active`, add a control with class `register-btn` and dispatch `register-click`.
+
+```html
+<button
+  type="button"
+  id="header-register"
+  class="register-btn"
+  onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))"
+>
+  Register
 </button>
 ```
 
