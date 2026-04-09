@@ -671,3 +671,82 @@ Displays product reviews with ratings, comments, and images. Includes a button t
   {% endif %}
 </div>
 ```
+
+---
+
+## Related Products
+
+**File:** `sections/related-products.liquid`  
+**Section key:** `related_products`
+
+A section rendered **below the product details** on the product page. It shows other products from the same category as the current product. The storefront renders this section only when `hide_related_products` is not set on the product and the product has at least one category.
+
+### Variables
+
+The same product variable contract as the homepage product sections applies here:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `products` | array | Related product objects from the same category |
+| `category` | object \| null | The product's first category with `name`, `slug`, `thumb` |
+| `section_title` | string | Translated "Similar products" heading |
+| `currency` | string | Currency symbol/code |
+| `add` | string | Translated "Add" button text |
+| `shop_now` | string | Translated "Shop now" text |
+| `sale` | string | Translated "Sale" label |
+| `theme_data` | object | Merchant-configured dynamic settings |
+
+**Product properties** and **variation properties** are identical to the other product sections.
+
+### Events
+
+| Event | Detail | Purpose |
+|-------|--------|---------|
+| `quick-add` | `{ productId: string }` | Adds the product to cart directly |
+| `quick-view` | `{ productId: string }` | Opens a quick-view modal for the product |
+
+### Example
+
+```liquid
+<section class="related-products">
+  {% if section_title %}
+    <h2 class="related-products-title">{{ section_title }}</h2>
+  {% endif %}
+
+  <div class="related-products-track">
+    {% for product in products %}
+      <a href="/products/{{ product.slug }}" class="product-card">
+        {% if product.sale_price and product.sale_price < product.price %}
+          {% assign discount = product.price | minus: product.sale_price | times: 100 | divided_by: product.price | floor %}
+          <span class="badge">{{ sale }} -{{ discount }}%</span>
+        {% endif %}
+
+        <div class="product-media">
+          <img src="{{ product.thumb }}" alt="{{ product.name }}" loading="lazy" />
+          {% if product.images[0] %}
+            <img class="hover-img" src="{{ product.images[0] }}" alt="{{ product.name }}" loading="lazy" />
+          {% endif %}
+          <button type="button"
+            onclick="event.preventDefault();event.stopPropagation();this.dispatchEvent(new CustomEvent('quick-add',{bubbles:true,detail:{productId:'{{ product.id }}'}}));">
+            {{ add }}
+          </button>
+        </div>
+
+        <div class="product-info">
+          <p>{{ product.name }}</p>
+          {% if product.sale_price and product.sale_price < product.price %}
+            <span class="price-old">{{ product.price }} {{ currency }}</span>
+            <span class="price-sale">{{ product.sale_price }} {{ currency }}</span>
+          {% else %}
+            <span>{{ product.price }} {{ currency }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+```
+
+:::tip
+Use a horizontal scrollable track (like `list-products.liquid`) for related products since the product page already has a lot of vertical content. Limit the products displayed to keep the page light — the storefront passes up to 5 products by default.
+:::
