@@ -27,7 +27,9 @@ my-theme/
 │   ├── product-description.liquid
 │   ├── featured-products.liquid
 │   ├── list-products.liquid
-│   ├── grid-products.liquid
+│   ├── home-products-grid.liquid
+│   ├── products-grid.liquid
+│   ├── related-products.liquid
 │   ├── slider.liquid
 │   ├── categories.liquid
 │   ├── reviews.liquid
@@ -56,7 +58,9 @@ When you upload a theme folder, each file maps to a specific field:
 | `sections/product-description.liquid` | `product_description` | Section | Product description block             |
 | `sections/featured-products.liquid`   | `featured_products`   | Section | Featured products grid                |
 | `sections/list-products.liquid`       | `list_products`       | Section | Products in list layout               |
-| `sections/grid-products.liquid`       | `grid_products`       | Section | Products in grid layout               |
+| `sections/home-products-grid.liquid`  | `home_products_grid`  | Section | Homepage product grid with hero       |
+| `sections/products-grid.liquid`       | `products_grid`       | Section | Product grid for search & collections |
+| `sections/related-products.liquid`    | `related_products`    | Section | Related products on product page      |
 | `sections/slider.liquid`              | `slider`              | Section | Hero/image slider                     |
 | `sections/categories.liquid`          | `categories`          | Section | Category listing                      |
 | `sections/reviews.liquid`             | `reviews`             | Section | Product reviews                       |
@@ -85,7 +89,7 @@ Each section can also be edited individually through the built-in code editor in
 
 ## Quick Start
 
-1. **Copy the Allbirds example** as a starting point — it implements all 17 sections with a clean, modern design.
+1. **Copy the Allbirds example** as a starting point — it implements all 20 sections with a clean, modern design.
 2. **Edit the Liquid templates** — each section receives specific variables (documented under [Layout sections](./sections/layout-sections) and [Product sections](./sections/product-sections)).
 3. **Write your CSS** — use [palette CSS variables](./palette) for merchant-configurable colors.
 4. **Define your schema** — add [dynamic settings](./dynamic-theme-data) so merchants can customize the theme without touching code.
@@ -98,5 +102,5 @@ Each section can also be edited individually through the built-in code editor in
 | [Palette](./palette)                                                                            | Merchant-configurable colors as CSS variables (`--hd-bg`, etc.) |
 | [Dynamic Theme Data](./dynamic-theme-data)                                                      | Merchant-configurable settings via `schema.json`                |
 | [Liquid Reference](./liquid-reference)                                                          | Template syntax, filters, and rendering                         |
-| [Layout sections](./sections/layout-sections) · [Product sections](./sections/product-sections) | All 17 section templates with variables, events, and examples   |
+| [Layout sections](./sections/layout-sections) · [Product sections](./sections/product-sections) · [Home sections](./sections/home-sections) | All 20 section templates with variables, events, and examples   |
 | [Events Reference](./events-reference)                                                          | Custom DOM events, link interception, and section data attributes |

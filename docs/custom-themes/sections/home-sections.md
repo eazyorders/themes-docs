@@ -16,19 +16,19 @@ A hero image slider / carousel. Each slide uses `image` as the main source and c
 
 ### Variables
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `slides` | array | Slide objects (see properties below) |
+| Variable     | Type   | Description                          |
+| ------------ | ------ | ------------------------------------ |
+| `slides`     | array  | Slide objects (see properties below) |
 | `theme_data` | object | Merchant-configured dynamic settings |
 
 **Slide properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `slide.image` | string | Main image URL (desktop + tablet, and fallback for all sizes) |
-| `slide.mobile_image` | string \| null | Optional mobile image URL used on screens `<= 425px` |
-| `slide.url` | string \| null | Optional link destination |
-| `slide.alt` | string | Alt text for the image |
+| Property             | Type           | Description                                                   |
+| -------------------- | -------------- | ------------------------------------------------------------- |
+| `slide.image`        | string         | Main image URL (desktop + tablet, and fallback for all sizes) |
+| `slide.mobile_image` | string \| null | Optional mobile image URL used on screens `<= 425px`          |
+| `slide.url`          | string \| null | Optional link destination                                     |
+| `slide.alt`          | string         | Alt text for the image                                        |
 
 :::info
 Render an `<a>` element only when `slide.url` is not empty; otherwise render a non-clickable `<div>`.
@@ -90,17 +90,17 @@ A category grid or carousel that links to collection pages.
 
 ### Variables
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `categories` | array | Category objects (see properties below) |
-| `theme_data` | object | Merchant-configured dynamic settings |
+| Variable     | Type   | Description                             |
+| ------------ | ------ | --------------------------------------- |
+| `categories` | array  | Category objects (see properties below) |
+| `theme_data` | object | Merchant-configured dynamic settings    |
 
 **Category properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `category.name` | string | Category display name |
-| `category.slug` | string | URL slug |
+| Property         | Type   | Description                  |
+| ---------------- | ------ | ---------------------------- |
+| `category.name`  | string | Category display name        |
+| `category.slug`  | string | URL slug                     |
 | `category.thumb` | string | Category thumbnail image URL |
 
 ### Example
@@ -118,61 +118,62 @@ A category grid or carousel that links to collection pages.
 
 ---
 
-## Products (Featured / List / Grid)
+## Products (Featured / List / Home Grid)
 
-Three section files share the same variable contract but render products in different layouts:
+Three section files share the same variable contract but render products in different layouts on the **homepage**:
 
-| File | Layout | Typical Use |
-|------|--------|-------------|
-| `sections/featured-products.liquid` | Featured hero + card grid | Homepage featured collection |
-| `sections/list-products.liquid` | Horizontal scrollable list | Homepage product carousel |
-| `sections/grid-products.liquid` | Multi-column grid with hero | Homepage product grid |
+| File                                 | Layout                      | Typical Use                  |
+| ------------------------------------ | --------------------------- | ---------------------------- |
+| `sections/featured-products.liquid`  | Featured hero + card grid   | Homepage featured collection |
+| `sections/list-products.liquid`      | Horizontal scrollable list  | Homepage product carousel    |
+| `sections/home-products-grid.liquid` | Multi-column grid with hero | Homepage product grid        |
 
 ### Variables (shared)
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `products` | array | Product objects (see properties below) |
-| `category` | object \| null | Parent category with `name`, `slug`, `thumb` |
-| `section_title` | string | Section heading text |
-| `currency` | string | Currency symbol/code |
-| `add` | string | Translated "Add" button text |
-| `shop_now` | string | Translated "Shop now" text |
-| `sale` | string | Translated "Sale" label |
-| `hide_view_all` | boolean | Whether to hide the "View all" link |
-| `theme_data` | object | Merchant-configured dynamic settings |
+| Variable        | Type           | Description                                  |
+| --------------- | -------------- | -------------------------------------------- |
+| `products`      | array          | Product objects (see properties below)       |
+| `category`      | object \| null | Parent category with `name`, `slug`, `thumb` |
+| `section_title` | string         | Section heading text                         |
+| `currency`      | string         | Currency symbol/code                         |
+| `add`           | string         | Translated "Add" button text                 |
+| `shop_now`      | string         | Translated "Shop now" text                   |
+| `sale`          | string         | Translated "Sale" label                      |
+| `hide_view_all` | boolean        | Whether to hide the "View all" link          |
+| `theme_data`    | object         | Merchant-configured dynamic settings         |
 
 **Product properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `product.id` | string | Product ID (used in events) |
-| `product.name` | string | Product name |
-| `product.slug` | string | URL slug |
-| `product.price` | number | Regular price |
-| `product.sale_price` | number \| null | Sale price |
-| `product.thumb` | string | Main thumbnail URL |
-| `product.images` | string[] | Additional image URLs |
-| `product.variations` | array | Variation groups with `type` and `props[]` |
+| Property             | Type           | Description                                |
+| -------------------- | -------------- | ------------------------------------------ |
+| `product.id`         | string         | Product ID (used in events)                |
+| `product.name`       | string         | Product name                               |
+| `product.slug`       | string         | URL slug                                   |
+| `product.price`      | number         | Regular price                              |
+| `product.sale_price` | number \| null | Sale price                                 |
+| `product.thumb`      | string         | Main thumbnail URL                         |
+| `product.images`     | string[]       | Additional image URLs                      |
+| `product.variations` | array          | Variation groups with `type` and `props[]` |
 
 **Variation properties (for color swatches):**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `variation.type` | string | `"color"` or `"image"` |
-| `variation.props` | array | Swatch items with `name` and `value` |
+| Property          | Type   | Description                          |
+| ----------------- | ------ | ------------------------------------ |
+| `variation.type`  | string | `"color"` or `"image"`               |
+| `variation.props` | array  | Swatch items with `name` and `value` |
 
 ### Events
 
-| Event | Detail | Purpose |
-|-------|--------|---------|
-| `quick-add` | `{ productId: string }` | Adds the product to cart directly |
+| Event        | Detail                  | Purpose                                  |
+| ------------ | ----------------------- | ---------------------------------------- |
+| `quick-add`  | `{ productId: string }` | Adds the product to cart directly        |
 | `quick-view` | `{ productId: string }` | Opens a quick-view modal for the product |
 
 Dispatch from your add-to-cart button:
 
 ```html
-onclick="event.preventDefault();event.stopPropagation();this.dispatchEvent(new CustomEvent('quick-add',{bubbles:true,detail:{productId:'{{ product.id }}'}}))"
+onclick="event.preventDefault();event.stopPropagation();this.dispatchEvent(new
+CustomEvent('quick-add',{bubbles:true,detail:{productId:'{{ product.id }}'}}))"
 ```
 
 ### Featured Products Example
@@ -249,3 +250,83 @@ Calculate and display a percentage discount:
   <span class="badge">{{ sale }} -{{ discount }}%</span>
 {% endif %}
 ```
+
+---
+
+## Products Grid (Search & Collections pages)
+
+**File:** `sections/products-grid.liquid`  
+**Section key:** `products_grid`
+
+A product grid rendered on the **search page** and **collection pages** (browsing a category). Unlike the homepage grid (`home-products-grid.liquid`), this template has no hero block and renders all products received from the current page of results. The "load more" button is rendered outside the Liquid template by the storefront.
+
+### Variables (shared)
+
+The same product variable contract as the homepage product sections applies here:
+
+| Variable        | Type           | Description                                                                             |
+| --------------- | -------------- | --------------------------------------------------------------------------------------- |
+| `products`      | array          | Current page of product objects                                                         |
+| `category`      | object \| null | Current category with `name`, `slug`, `thumb` (collections page only; `null` on search) |
+| `section_title` | string         | Section heading — category name on collections, search query on search page             |
+| `currency`      | string         | Currency symbol/code                                                                    |
+| `add`           | string         | Translated "Add" button text                                                            |
+| `shop_now`      | string         | Translated "Shop now" text                                                              |
+| `sale`          | string         | Translated "Sale" label                                                                 |
+| `hide_view_all` | boolean        | Always `true` on this section (storefront hides the view-all link)                      |
+| `theme_data`    | object         | Merchant-configured dynamic settings                                                    |
+
+**Product properties** and **variation properties** are identical to the other product sections — see above.
+
+### Events
+
+| Event        | Detail                  | Purpose                                  |
+| ------------ | ----------------------- | ---------------------------------------- |
+| `quick-add`  | `{ productId: string }` | Adds the product to cart directly        |
+| `quick-view` | `{ productId: string }` | Opens a quick-view modal for the product |
+
+### Example
+
+```liquid
+<section class="products-grid">
+  {% if section_title %}
+    <h2 class="products-grid-title">{{ section_title }}</h2>
+  {% endif %}
+
+  <div class="products-grid-wrap">
+    {% for product in products %}
+      <a href="/products/{{ product.slug }}" class="product-card">
+        {% if product.sale_price and product.sale_price < product.price %}
+          {% assign discount = product.price | minus: product.sale_price | times: 100 | divided_by: product.price | floor %}
+          <span class="badge">{{ sale }} -{{ discount }}%</span>
+        {% endif %}
+
+        <div class="product-media">
+          <img src="{{ product.thumb }}" alt="{{ product.name }}" loading="lazy" />
+          {% if product.images[0] %}
+            <img class="hover-img" src="{{ product.images[0] }}" alt="{{ product.name }}" loading="lazy" />
+          {% endif %}
+          <button type="button"
+            onclick="event.preventDefault();event.stopPropagation();this.dispatchEvent(new CustomEvent('quick-add',{bubbles:true,detail:{productId:'{{ product.id }}'}}));">
+            {{ add }}
+          </button>
+        </div>
+
+        <div class="product-info">
+          <p>{{ product.name }}</p>
+          {% if product.sale_price and product.sale_price < product.price %}
+            <span class="price-old">{{ product.price }} {{ currency }}</span>
+            <span class="price-sale">{{ product.sale_price }} {{ currency }}</span>
+          {% else %}
+            <span>{{ product.price }} {{ currency }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+```
+
+:::info
+On collections pages the storefront renders a "Load more" button **outside** this template using React. Each click fetches the next page and re-renders this template with the full accumulated product list.
+:::
