@@ -164,16 +164,34 @@ Three section files share the same variable contract but render products in diff
 
 ### Events
 
-| Event        | Detail                  | Purpose                                  |
-| ------------ | ----------------------- | ---------------------------------------- |
-| `quick-add`  | `{ productId: string }` | Adds the product to cart directly        |
-| `quick-view` | `{ productId: string }` | Opens a quick-view modal for the product |
+| Event             | Detail                  | Purpose                                                                           |
+| ----------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `quick-add`       | `{ productId: string }` | Adds the product to cart directly                                                 |
+| `quick-view`      | `{ productId: string }` | Opens a quick-view modal for the product                                          |
+| `toggle-wishlist` | `{ productId: string }` | Toggles the product in the wishlist (adds if absent, removes if already saved)    |
+| `toggle-compare`  | `{ productId: string }` | Adds the product to the compare list (if not present) and opens the compare modal |
 
 Dispatch from your add-to-cart button:
 
 ```html
 onclick="event.preventDefault();event.stopPropagation();this.dispatchEvent(new
 CustomEvent('quick-add',{bubbles:true,detail:{productId:'{{ product.id }}'}}))"
+```
+
+Dispatch from your wishlist / compare buttons:
+
+```html
+<button type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-wishlist',{bubbles:true,detail:{productId:'{{ product.id }}'}}))">
+  ♡
+</button>
+
+<button type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-compare',{bubbles:true,detail:{productId:'{{ product.id }}'}}))">
+  Compare
+</button>
 ```
 
 ### Featured Products Example
@@ -280,10 +298,12 @@ The same product variable contract as the homepage product sections applies here
 
 ### Events
 
-| Event        | Detail                  | Purpose                                  |
-| ------------ | ----------------------- | ---------------------------------------- |
-| `quick-add`  | `{ productId: string }` | Adds the product to cart directly        |
-| `quick-view` | `{ productId: string }` | Opens a quick-view modal for the product |
+| Event             | Detail                  | Purpose                                                                           |
+| ----------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `quick-add`       | `{ productId: string }` | Adds the product to cart directly                                                 |
+| `quick-view`      | `{ productId: string }` | Opens a quick-view modal for the product                                          |
+| `toggle-wishlist` | `{ productId: string }` | Toggles the product in the wishlist (adds if absent, removes if already saved)    |
+| `toggle-compare`  | `{ productId: string }` | Adds the product to the compare list (if not present) and opens the compare modal |
 
 ### Example
 

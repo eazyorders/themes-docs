@@ -21,17 +21,21 @@ The header HTML is rendered **server-side** on first load (`header_html`) for fa
 | `categories`          | array   | Nav items: each item has `name`, `url`, and optional `children[]` (each child: `name`, `url`)                                  |
 | `announcement_config` | object  | Announcement bar from merchant theme settings: `text` is `string[]`, `type` is `"simple"`, `"slider"`, or `"marquee"`          |
 | `announcement_text`   | string  | Fallback single-line announcement when config is not used                                                                      |
-| `cart_count`          | number  | Cart item count at SSR time; should match the initial `#header-cart-count` text and `hidden` state (client keeps them in sync) |
-| `is_register_active`  | boolean | When `true`, show a register control and dispatch `register-click`                                                             |
+| `cart_count`          | number  | Cart item count at SSR time; should match the initial `#header-cart-count` text and `hidden` state (client keeps them in sync)     |
+| `compare_count`       | number  | Compare list count at SSR time; should match the initial `#header-compare-count` text and `hidden` state (client keeps them in sync) |
+| `wishlist_count`      | number  | Wishlist count at SSR time; should match the initial `#header-wishlist-count` text and `hidden` state (client keeps them in sync)    |
+| `is_register_active`  | boolean | When `true`, show a register control and dispatch `register-click`                                                                   |
 | `theme_data`          | object  | Merchant-configured dynamic settings from `schema.json`                                                                        |
 
 ### Required element IDs
 
 | ID                                          | Purpose                                                                                                                                                                                                        |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `header-cart-count`                         | Put this `id` on the cart badge element (for example a `span`). The storefront replaces its text content with the live cart count and toggles the HTML `hidden` attribute based on whether that count is zero. |
-| `header-lang-btn`, `header-lang-mobile`     | Put this `id` on the language control (for example `button` elements), one for desktop and one for mobile. When the Multi-language plugin is not active, the storefront sets `hidden` on those elements.       |
-| `header-register`, `header-register-mobile` | Put this `id` on the register control (for example `button` elements), one for desktop and one for mobile. These ids are reserved for a future storefront feature.                                             |
+| `header-cart-count`                         | Put this `id` on the cart badge element (for example a `span`). The storefront replaces its text content with the live cart count and toggles the HTML `hidden` attribute based on whether that count is zero.     |
+| `header-compare-count`                      | Put this `id` on the compare badge element (for example a `span`). The storefront replaces its text content with the live compare list count and toggles `hidden` accordingly. Also wire `compare-click` on the parent button. |
+| `header-wishlist-count`                     | Put this `id` on the wishlist badge element (for example a `span`). The storefront replaces its text content with the live wishlist count and toggles `hidden` accordingly. Use a plain `<a href="/wishlist">` — no custom event needed. |
+| `header-lang-btn`, `header-lang-mobile`     | Put this `id` on the language control (for example `button` elements), one for desktop and one for mobile. When the Multi-language plugin is not active, the storefront sets `hidden` on those elements.               |
+| `header-register`, `header-register-mobile` | Put this `id` on the register control (for example `button` elements), one for desktop and one for mobile. These ids are reserved for a future storefront feature.                                                       |
 
 :::note
 Register ids `header-register` and `header-register-mobile` are documented so themes stay consistent ahead of a future storefront feature. Current behavior uses `is_register_active`, `register-btn`, and the `register-click` custom event only.
@@ -46,6 +50,7 @@ Dispatch **bubbling** `CustomEvents` from the header so they reach the section r
 | Event            | Element          | Purpose                                                                                                                                                                                                                                 |
 | ---------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cart-click`     | Cart control     | Opens the side cart. Example: `onclick="this.dispatchEvent(new CustomEvent('cart-click',{bubbles:true}))"` on the cart `<button>` (keep class `cart-btn` if your theme CSS targets it).                                                 |
+| `compare-click`  | Compare control  | Opens the compare modal. Example: `onclick="this.dispatchEvent(new CustomEvent('compare-click',{bubbles:true}))"` on a button that also contains the `#header-compare-count` badge.                                                     |
 | `lang-click`     | Language control | Toggles the language dropdown. Example: `onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"` on the element with class `lang-btn`.                                                                              |
 | `register-click` | Register control | Navigates to `/register` (client-side). Example: `onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))"` on a `<button>` with class `register-btn`. Only render the control when `is_register_active` is true. |
 
@@ -55,6 +60,10 @@ Below is an end-to-end header (announcement bar, desktop nav, cart/language/sear
 
 :::warning
 Without event **`cart-click`** on the cart control, the side cart will not open. Without a persistent **`id="header-cart-count"`** badge, the cart count will not stay in sync. Without **`lang-btn`** (and **`lang-click`**), the language UI will not work. The register control is optional: when `is_register_active` is true, use **`register-click`** on a **`register-btn`** element so the storefront can open registration.
+
+For the compare feature: without **`compare-click`** on your compare button, the compare modal will not open from the header. Without **`id="header-compare-count"`**, the live compare count badge will not update.
+
+For the wishlist: use a plain **`<a href="/wishlist">`** link — no custom event is needed. If you add a **`id="header-wishlist-count"`** badge inside it, the storefront keeps the count in sync.
 :::
 
 #### `sections/header.liquid`
@@ -130,7 +139,7 @@ Without event **`cart-click`** on the cart control, the side cart will not open.
       <button type="button" id="header-register" class="header-icon-btn register-btn" aria-label="Register" onclick="this.dispatchEvent(new CustomEvent('register-click',{bubbles:true}))"></button>
       {% endif %}
 
-      <button type="button" class="header-icon-btn lang-btn" aria-label="Change Language" onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"></button>
+      <button type="button" class="header-icon-btn lang-btn" aria-label="Change Language" hidden onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}))"></button>
 
       <button type="button" class="header-icon-btn cart-btn" aria-label="Cart" onclick="this.dispatchEvent(new CustomEvent('cart-click',{bubbles:true}))">
         <span id="header-cart-count" class="cart-badge" hidden>{{ cart_count }}</span>
@@ -183,9 +192,9 @@ Without event **`cart-click`** on the cart control, the side cart will not open.
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
     </button>
     {% endif %}
-    <a id="header-lang-mobile" class="lang-btn" onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}));return false;" href="#">
+    <button id="header-lang-mobile" class="lang-btn" hidden onclick="this.dispatchEvent(new CustomEvent('lang-click',{bubbles:true}));return false;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8l4 4-4 4"/></svg>
-    </a>
+    </button>
   </nav>
 </div>
 

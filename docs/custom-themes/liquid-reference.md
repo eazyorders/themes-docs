@@ -255,6 +255,68 @@ Filters transform a value. Chain them with `|`:
 {% endfor %}
 ```
 
+### Wishlist Toggle Button (Product Cards and Product Details)
+
+Use the `toggle-wishlist` event on any button. The storefront adds or removes the product from the persisted wishlist:
+
+```liquid
+<button
+  type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-wishlist',{
+      bubbles:true,
+      detail:{productId:'{{ product.id }}'}
+    }))"
+  aria-label="Add to wishlist"
+>
+  ♡
+</button>
+```
+
+### Compare Toggle Button (Product Cards and Product Details)
+
+Use the `toggle-compare` event to add a product to the compare list and open the compare modal:
+
+```liquid
+<button
+  type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-compare',{
+      bubbles:true,
+      detail:{productId:'{{ product.id }}'}
+    }))"
+  aria-label="Compare"
+>
+  Compare
+</button>
+```
+
+### Header Compare Badge and Wishlist Link
+
+The header receives `compare_count` and `wishlist_count` as initial values at SSR time. The storefront keeps `#header-compare-count` and `#header-wishlist-count` in sync on every client-side update, just like `#header-cart-count`.
+
+For compare, dispatch a `compare-click` event from the button to open the compare modal:
+
+```liquid
+<button
+  type="button"
+  onclick="this.dispatchEvent(new CustomEvent('compare-click',{bubbles:true}))"
+  aria-label="Compare"
+>
+  ⇄
+  <span id="header-compare-count" hidden>{{ compare_count }}</span>
+</button>
+```
+
+For wishlist, use a plain `<a>` tag — no custom event is needed (link interception handles navigation):
+
+```liquid
+<a href="/wishlist" aria-label="Wishlist">
+  ♡
+  <span id="header-wishlist-count" hidden>{{ wishlist_count }}</span>
+</a>
+```
+
 ---
 
 ## Link Interception
