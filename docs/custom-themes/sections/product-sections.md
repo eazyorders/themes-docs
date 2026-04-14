@@ -139,6 +139,19 @@ Displays the product name, price, rating, and optional short description.
 | `description`   | string \| null | Short description (when `is_description_in_details` is true) |
 | `theme_data`    | object         | Merchant-configured dynamic settings                         |
 
+### Events
+
+The `product-details` section supports wishlist and compare actions. Dispatch these events from any element inside the section — they bubble up to the React wrapper.
+
+| Event             | Detail                  | Behavior                                                                         |
+| ----------------- | ----------------------- | -------------------------------------------------------------------------------- |
+| `toggle-wishlist` | `{ productId: string }` | Toggles the product in the wishlist (adds if absent, removes if already saved)   |
+| `toggle-compare`  | `{ productId: string }` | Adds the product to the compare list (if not present) and opens the compare modal |
+
+:::note
+The `productId` in the event detail must match the product's `id` field as provided to the section by the storefront. Use `{{ product_id }}` if you pass it as a variable, or hardcode it from the product data.
+:::
+
 ### Example
 
 ```liquid
@@ -171,6 +184,30 @@ Displays the product name, price, rating, and optional short description.
   {% if description and description != "" %}
     <p class="short-desc">{{ description }}</p>
   {% endif %}
+
+  <div class="product-actions">
+    <button
+      type="button"
+      onclick="event.preventDefault();event.stopPropagation();
+        this.dispatchEvent(new CustomEvent('toggle-wishlist',{
+          bubbles:true,
+          detail:{productId:'{{ product_id }}'}
+        }))"
+    >
+      ♡ Wishlist
+    </button>
+
+    <button
+      type="button"
+      onclick="event.preventDefault();event.stopPropagation();
+        this.dispatchEvent(new CustomEvent('toggle-compare',{
+          bubbles:true,
+          detail:{productId:'{{ product_id }}'}
+        }))"
+    >
+      Compare
+    </button>
+  </div>
 </div>
 ```
 

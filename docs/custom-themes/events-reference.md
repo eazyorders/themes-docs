@@ -26,6 +26,9 @@ Your Liquid templates dispatch `CustomEvent` instances to communicate user actio
 | `decrement-quantity` | Fixed Buy Button              | —                                       | Decreases the quantity by 1                                                                               |
 | `quick-add`          | Products (featured/list/grid) | `{ productId: string }`                 | Adds a product to cart from the listing                                                                   |
 | `quick-view`         | Products (featured/list/grid) | `{ productId: string }`                 | Opens a quick-view modal for a product                                                                    |
+| `toggle-wishlist`    | Products (featured/list/grid), Product details | `{ productId: string }` | Toggles the product in the wishlist — adds it if absent, removes it if already saved                    |
+| `toggle-compare`     | Products (featured/list/grid), Product details | `{ productId: string }` | Adds the product to the compare list (if not already present) and opens the compare modal               |
+| `compare-click`      | Header                        | —                                       | Opens the compare modal; dispatch from the compare badge/icon in the header                               |
 | `go-home`            | Thanks                        | —                                       | Navigates to the store homepage                                                                           |
 | `copy-tracking-link` | Order Invoice                 | `{ link: string }`                      | Copies the tracking URL to clipboard and shows a toast                                                    |
 
@@ -189,6 +192,59 @@ When the header receives `is_register_active`, add a control with class `registe
 >
   Add
 </button>
+```
+
+### Wishlist Toggle (Product Cards and Product Details)
+
+```html
+<button
+  type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-wishlist',{
+      bubbles:true,
+      detail:{productId:'{{ product.id }}'}
+    }))"
+>
+  ♡
+</button>
+```
+
+### Compare Toggle (Product Cards and Product Details)
+
+```html
+<button
+  type="button"
+  onclick="event.preventDefault();event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('toggle-compare',{
+      bubbles:true,
+      detail:{productId:'{{ product.id }}'}
+    }))"
+>
+  Compare
+</button>
+```
+
+### Header Compare Badge
+
+```html
+<button
+  type="button"
+  onclick="this.dispatchEvent(new CustomEvent('compare-click',{bubbles:true}))"
+>
+  Compare
+  <span id="header-compare-count" hidden>0</span>
+</button>
+```
+
+### Header Wishlist Link
+
+The wishlist page does not need a custom event. Use a plain `<a>` tag — the storefront's link interception handles SPA navigation automatically:
+
+```html
+<a href="/wishlist">
+  Wishlist
+  <span id="header-wishlist-count" hidden>0</span>
+</a>
 ```
 
 ### Footer Newsletter form
