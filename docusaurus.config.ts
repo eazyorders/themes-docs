@@ -4,27 +4,18 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "EasyOrders Themes Docs",
-  tagline: "EasyOrders Themes Documentation",
-  favicon: "https://www.easy-orders.net/easy-icon.png",
+  tagline: "Build beautiful storefronts with EasyOrders themes",
+  favicon: "https://www.easyorders.eg/easy-icon.png",
 
-  // Set the production url of your site here
-  url: "https://your-docusaurus-site.example.com",
-
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
+  url: "https://themes-docs.easyorders.eg",
   baseUrl: "/",
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: "easyorders", // Usually your GitHub org/user name.
-  projectName: "easyorders api", // Usually your repo name.
+  organizationName: "easyorders",
+  projectName: "easyorders themes",
 
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "en",
     locales: ["en"],
@@ -36,17 +27,9 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/eazyorders/themes-docs/blob/main/",
         },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -55,71 +38,75 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: "img/docusaurus-social-card.jpg",
-    navbar: {
-      title: "Easy Orders",
-      logo: {
-        alt: "My Site Logo",
-        src: "https://www.easy-orders.net/easy-icon.png",
-      },
-      // items: [
-      //   {
-      //     type: "doc",
-      //     docId: "intro",
-      //     position: "left",
-      //     label: "Tutorial",
-      //   },
-      // ],
+    image: "https://www.easyorders.eg/easy-icon.png",
+    colorMode: {
+      defaultMode: "light",
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
-    // footer: {
-    //   style: 'dark',
-    //   links: [
-    //     {
-    //       title: 'Docs',
-    //       items: [
-    //         {
-    //           label: 'Tutorial',
-    //           to: '/docs/intro',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       title: 'Community',
-    //       items: [
-    //         {
-    //           label: 'Stack Overflow',
-    //           href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-    //         },
-    //         {
-    //           label: 'Discord',
-    //           href: 'https://discordapp.com/invite/docusaurus',
-    //         },
-    //         {
-    //           label: 'Twitter',
-    //           href: 'https://twitter.com/docusaurus',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       title: 'More',
-    //       items: [
-    //         {
-    //           label: 'Blog',
-    //           to: '/blog',
-    //         },
-    //         {
-    //           label: 'GitHub',
-    //           href: 'https://github.com/facebook/docusaurus',
-    //         },
-    //       ],
-    //     },
-    //   ],
-    //   copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
-    // },
+    navbar: {
+      title: "EasyOrders Themes",
+      logo: {
+        alt: "EasyOrders",
+        src: "https://www.easyorders.eg/easy-icon.png",
+        style: { height: "28px" },
+      },
+      items: [
+        {
+          type: "doc",
+          docId: "custom-themes/getting-started",
+          position: "left",
+          label: "Custom Themes",
+        },
+        {
+          type: "doc",
+          docId: "funnels/funnels",
+          position: "left",
+          label: "Funnels Builder",
+        },
+        {
+          href: "https://www.easyorders.eg",
+          label: "EasyOrders.eg",
+          position: "right",
+        },
+      ],
+    },
+    footer: {
+      style: "light",
+      links: [
+        {
+          title: "Custom Themes",
+          items: [
+            { label: "Getting Started", to: "/docs/custom-themes/getting-started" },
+            { label: "Liquid Reference", to: "/docs/custom-themes/liquid-reference" },
+            { label: "Events Reference", to: "/docs/custom-themes/events-reference" },
+          ],
+        },
+        {
+          title: "Funnels Builder",
+          items: [
+            { label: "Funnels", to: "/docs/funnels/funnels" },
+          ],
+        },
+        {
+          title: "Resources",
+          items: [
+            { label: "Palette", to: "/docs/custom-themes/palette" },
+            { label: "Sections", to: "/docs/category/sections" },
+            { label: "EasyOrders Website", href: "https://www.easyorders.eg" },
+          ],
+        },
+      ],
+      copyright: `© ${new Date().getFullYear()} EasyOrders. All rights reserved.`,
+    },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ["bash", "json"],
+    },
+    tableOfContents: {
+      minHeadingLevel: 2,
+      maxHeadingLevel: 4,
     },
   } satisfies Preset.ThemeConfig,
 };
