@@ -32,13 +32,14 @@ Your `schema.json` is an array of field objects. Each field has a `name`, `type`
 
 ### Primitive Fields
 
-| Type       | Renders As    | Value                            |
-| ---------- | ------------- | -------------------------------- |
-| `string`   | Text input    | `string`                         |
-| `number`   | Number input  | `number`                         |
-| `color`    | Color picker  | `string` (hex, e.g. `"#1A1A2E"`) |
-| `boolean`  | Toggle switch | `true` / `false`                 |
-| `checkbox` | Checkbox      | `true` / `false`                 |
+| Type       | Renders As     | Value                            |
+| ---------- | -------------- | -------------------------------- |
+| `string`   | Text input     | `string`                         |
+| `number`   | Number input   | `number`                         |
+| `color`    | Color picker   | `string` (hex, e.g. `"#1A1A2E"`) |
+| `boolean`  | Toggle switch  | `true` / `false`                 |
+| `checkbox` | Checkbox       | `true` / `false`                 |
+| `image`    | Image uploader | `string` (URL of the uploaded image) |
 
 ```json
 {
@@ -74,6 +75,23 @@ Your `schema.json` is an array of field objects. Each field has a `name`, `type`
   "default": true,
   "description": "Show dark overlay on hero image"
 }
+```
+
+```json
+{
+  "name": "hero_background_image",
+  "type": "image",
+  "default": "",
+  "description": "Hero background image"
+}
+```
+
+The merchant sees an image upload area with drag-and-drop support and a live preview. The stored value is a plain URL string — use it in Liquid exactly like any other string field:
+
+```liquid
+{% if theme_data.hero_background_image != blank %}
+  <img src="{{ theme_data.hero_background_image }}" alt="Hero" />
+{% endif %}
 ```
 
 ### Select Field
@@ -223,6 +241,12 @@ A repeatable group of fields. Merchants can add, remove, and reorder items. Each
   "description": "Hero slides",
   "fields": [
     {
+      "name": "image",
+      "type": "image",
+      "default": "",
+      "description": "Slide background image"
+    },
+    {
       "name": "title",
       "type": "string",
       "default": "",
@@ -287,6 +311,12 @@ Here is a full `schema.json` demonstrating every field type:
     "description": "Hero headline text"
   },
   {
+    "name": "hero_background_image",
+    "type": "image",
+    "default": "",
+    "description": "Hero background image"
+  },
+  {
     "name": "font_size_base",
     "type": "number",
     "default": 16,
@@ -346,6 +376,12 @@ Here is a full `schema.json` demonstrating every field type:
     "type": "object_array",
     "description": "Hero slides",
     "fields": [
+      {
+        "name": "image",
+        "type": "image",
+        "default": "",
+        "description": "Slide background image"
+      },
       {
         "name": "title",
         "type": "string",
@@ -418,6 +454,9 @@ The `theme_data` object is automatically injected into **every** section templat
 {% for slide in theme_data.hero_slides %}
   {% if slide.enabled %}
     <div class="slide" style="color: {{ slide.text_color }}">
+      {% if slide.image != blank %}
+        <img src="{{ slide.image }}" alt="{{ slide.title }}" />
+      {% endif %}
       <h2>{{ slide.title }}</h2>
     </div>
   {% endif %}
@@ -478,7 +517,7 @@ For global color values, prefer using the [Palette](./palette) system instead of
 | Property      | Required                                                                                    | Type     | Description                                                                                                                                                                |
 | ------------- | ------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`        | Yes                                                                                         | `string` | Unique key — becomes `theme_data.{name}` in Liquid                                                                                                                         |
-| `type`        | Yes                                                                                         | `string` | One of: `string`, `number`, `color`, `boolean`, `checkbox`, `select`, `multi_select`, `product_multi_select`, `category_multi_select`, `page_multi_select`, `object_array` |
+| `type`        | Yes                                                                                         | `string` | One of: `string`, `number`, `color`, `boolean`, `checkbox`, `image`, `select`, `multi_select`, `product_multi_select`, `category_multi_select`, `page_multi_select`, `object_array` |
 | `description` | Yes                                                                                         | `string` | Label shown to merchants in the settings form                                                                                                                              |
 | `default`     | No (not allowed for `product_multi_select` / `category_multi_select` / `page_multi_select`) | varies   | Default value when merchant hasn't set one                                                                                                                                 |
 | `options`     | For `select` / `multi_select`                                                               | `array`  | Array of `{ label, value }` objects                                                                                                                                        |
@@ -492,6 +531,7 @@ For global color values, prefer using the [Palette](./palette) system instead of
 | `number`                | `number`                                         | `16`                       |
 | `color`                 | `string` (hex)                                   | `"#1A1A2E"`                |
 | `boolean` / `checkbox`  | `boolean`                                        | `true`                     |
+| `image`                 | `string` (URL)                                   | `"https://files.easy-orders.net/img.jpg"` |
 | `select`                | `string` (one of `options[].value`)              | `"dark"`                   |
 | `multi_select`          | `string[]` (subset of `options`)                 | `["sale", "new"]`          |
 | `product_multi_select`  | `string[]` of product IDs (in merchant's order)  | `["prod_abc", "prod_xyz"]` |
