@@ -154,6 +154,7 @@ Three section files share the same variable contract but render products in diff
 | `product.thumb`      | string         | Main thumbnail URL                         |
 | `product.images`     | string[]       | Additional image URLs                      |
 | `product.variations` | array          | Variation groups with `type` and `props[]` |
+| `product.product_theme_data` | object         | Merchant-configured dynamic settings for each product, set on the product edit page in the Seller Dashboard |
 
 **Variation properties (for color swatches):**
 
