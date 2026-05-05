@@ -32,13 +32,14 @@ Your `schema.json` is an array of field objects. Each field has a `name`, `type`
 
 ### Primitive Fields
 
-| Type       | Renders As    | Value                            |
-| ---------- | ------------- | -------------------------------- |
-| `string`   | Text input    | `string`                         |
-| `number`   | Number input  | `number`                         |
-| `color`    | Color picker  | `string` (hex, e.g. `"#1A1A2E"`) |
-| `boolean`  | Toggle switch | `true` / `false`                 |
-| `checkbox` | Checkbox      | `true` / `false`                 |
+| Type       | Renders As     | Value                                |
+| ---------- | -------------- | ------------------------------------ |
+| `string`   | Text input     | `string`                             |
+| `number`   | Number input   | `number`                             |
+| `color`    | Color picker   | `string` (hex, e.g. `"#1A1A2E"`)     |
+| `boolean`  | Toggle switch  | `true` / `false`                     |
+| `checkbox` | Checkbox       | `true` / `false`                     |
+| `image`    | Image uploader | `string` (URL of the uploaded image) |
 
 ```json
 {
@@ -74,6 +75,23 @@ Your `schema.json` is an array of field objects. Each field has a `name`, `type`
   "default": true,
   "description": "Show dark overlay on hero image"
 }
+```
+
+```json
+{
+  "name": "hero_background_image",
+  "type": "image",
+  "default": "",
+  "description": "Hero background image"
+}
+```
+
+The merchant sees an image upload area with drag-and-drop support and a live preview. The stored value is a plain URL string — use it in Liquid exactly like any other string field:
+
+```liquid
+{% if theme_data.hero_background_image != blank %}
+  <img src="{{ theme_data.hero_background_image }}" alt="Hero" />
+{% endif %}
 ```
 
 ### Select Field
@@ -114,9 +132,149 @@ A multi-select dropdown. The value is an array of strings.
 }
 ```
 
+### Entity Multi-Select Fields (Products / Categories / Pages)
+
+Three special multi-select types let merchants pick **store entities** — products, categories, or simple pages — from a searchable list. The settings form renders a debounced search input, a reorderable list of chosen items, and a remove button per item. The merchant can:
+
+- Search the catalog as they type (server-side, paginated)
+- Add multiple items
+- Reorder items with up / down buttons
+- Remove items individually
+
+| Field type              | Renders As                   | Value                     | Searches In     |
+| ----------------------- | ---------------------------- | ------------------------- | --------------- |
+| `product_multi_select`  | Searchable products picker   | `string[]` (product IDs)  | `/products`     |
+| `category_multi_select` | Searchable categories picker | `string[]` (category IDs) | `/categories`   |
+| `page_multi_select`     | Searchable pages picker      | `string[]` (page IDs)     | `/simple-pages` |
+
+The stored value is **always a flat array of string IDs in the merchant's chosen order** — no names, slugs, thumbnails, or any other entity data. The theme author is responsible for fetching the entity records and mapping the IDs to whatever data their template needs (see [Resolving IDs in templates](#resolving-ids-in-templates) below).
+
+:::tip
+When you resolve those IDs in the **browser** (e.g. Pattern B with `fetch`), handle **loading** (placeholders, skeletons, or reserved space so the layout does not jump) and **errors** (network failures, non-OK responses, empty or unexpected payloads) not only the happy path.
+:::
+
+```json
+{
+  "name": "featured_product_ids",
+  "type": "product_multi_select",
+  "description": "Featured products (homepage)"
+}
+```
+
+```json
+{
+  "name": "footer_category_ids",
+  "type": "category_multi_select",
+  "description": "Categories shown in footer"
+}
+```
+
+```json
+{
+  "name": "footer_page_ids",
+  "type": "page_multi_select",
+  "description": "Pages linked from footer"
+}
+```
+
+:::info
+These three field types do **not** accept `default`, `options`, `min`, or `max`. They always start as an empty array and have no upper limit on how many items can be selected — slice or paginate inside your Liquid template if you need to cap how many items render.
+:::
+
+### Entity Single-Select Fields (Products / Categories / Pages) {#entity-single-select-fields-products--categories--pages}
+
+Three **single-select** types reference the same store entities as the multi-select pickers, but the merchant picks **at most one** product, category, or page. The control is a searchable combobox (server-side search, same endpoints as the multi-select types), supports clearing the selection, and stores a **single string ID** — not an array.
+
+| Field type               | Renders As                     | Value                      | Searches In     |
+| ------------------------ | ------------------------------ | -------------------------- | --------------- |
+| `product_single_select`  | Searchable product picker      | `string` (one product ID)  | `/products`     |
+| `category_single_select` | Searchable category picker     | `string` (one category ID) | `/categories`   |
+| `page_single_select`     | Searchable simple-pages picker | `string` (one page ID)     | `/simple-pages` |
+
+When nothing is selected, the value is an **empty string** (`""`). There is still no embedded title, slug, or image — resolve the ID in Liquid or in `script.js` the same way as for multi-select (see [Resolving IDs in Templates](#resolving-ids-in-templates)).
+
+```json
+{
+  "name": "hero_product_id",
+  "type": "product_single_select",
+  "description": "Product highlighted in hero"
+}
+```
+
+```json
+{
+  "name": "promo_category_id",
+  "type": "category_single_select",
+  "description": "Category linked from promo strip"
+}
+```
+
+```json
+{
+  "name": "legal_page_id",
+  "type": "page_single_select",
+  "description": "Simple page opened from footer link"
+}
+```
+
+:::info
+Like the entity multi-select types, these three do **not** accept `default`, `options`, `min`, or `max`. The stored value starts as `""` until the merchant chooses an entity (or stays empty if they clear the field).
+:::
+
+#### Resolving IDs in Templates
+
+`theme_data` contains either an **array of IDs** (multi-select) or a **single ID string** (single-select) for the fields the merchant configured. To render names, prices, thumbnails, etc., resolve the IDs against the data your section already receives, or fetch them client-side from your `script.js`.
+
+##### Pattern A — Filter from data already in scope
+
+Sections like `featured-products`, `list-products`, and `home-products-grid` already receive a `products` array. You can pick out the merchant's selection in pure Liquid:
+
+```liquid
+{% comment %} Render only the products the merchant featured, in their chosen order {% endcomment %}
+{% for fid in theme_data.featured_product_ids %}
+  {% assign featured = products | where: "id", fid | first %}
+  {% if featured %}
+    <a href="/products/{{ featured.slug }}" class="product-card">
+      <img src="{{ featured.thumb }}" alt="{{ featured.name }}" />
+      <p>{{ featured.name }}</p>
+      <span>{{ featured.price }} {{ currency }}</span>
+    </a>
+  {% endif %}
+{% endfor %}
+```
+
+##### Pattern B — Print IDs and hydrate via `script.js`
+
+When the section doesn't receive the entity in its template variables (or you want to be lazy about it), print the IDs as a JSON list and hydrate from your `script.js` using the storefront API:
+
+```liquid
+<div
+  class="featured-products"
+  data-product-ids='[{% for id in theme_data.featured_product_ids %}"{{ id }}"{% unless forloop.last %},{% endunless %}{% endfor %}]'
+></div>
+```
+
+```js
+document.querySelectorAll(".featured-products").forEach(async (el) => {
+  const ids = JSON.parse(el.dataset.productIds);
+  if (ids.length === 0) return;
+  const res = await fetch(
+    `/api/products?filter=id||$in||${ids.join(",")}&limit=${ids.length}`
+  );
+  const { data } = await res.json();
+  // render `data` into `el`, preserving the merchant's order
+});
+```
+
+:::tip
+Always preserve the merchant's order when rendering — the array order is the display order they configured in the builder.
+:::
+
+For a **single** ID, call the same endpoints as for multi-select (for example `filter=id||$in||${id}` with one ID) or read a `data-*` attribute in `script.js` and skip fetching when it is empty.
+
 ### Object Array Field
 
-A repeatable group of fields. Merchants can add, remove, and reorder items. Each item is an object with its own fields (only primitive, select, and multi-select — no nested object arrays).
+A repeatable group of fields. Merchants can add, remove, and reorder items. Each item is an object with its own fields — primitive, select, multi-select, the [entity multi-select](#entity-multi-select-fields-products--categories--pages) types, and the [entity single-select](#entity-single-select-fields-products--categories--pages) types are all allowed inside. Nested `object_array` fields are not supported.
 
 ```json
 {
@@ -124,6 +282,12 @@ A repeatable group of fields. Merchants can add, remove, and reorder items. Each
   "type": "object_array",
   "description": "Hero slides",
   "fields": [
+    {
+      "name": "image",
+      "type": "image",
+      "default": "",
+      "description": "Slide background image"
+    },
     {
       "name": "title",
       "type": "string",
@@ -189,6 +353,12 @@ Here is a full `schema.json` demonstrating every field type:
     "description": "Hero headline text"
   },
   {
+    "name": "hero_background_image",
+    "type": "image",
+    "default": "",
+    "description": "Hero background image"
+  },
+  {
     "name": "font_size_base",
     "type": "number",
     "default": 16,
@@ -229,10 +399,46 @@ Here is a full `schema.json` demonstrating every field type:
     "description": "Active product badge types"
   },
   {
+    "name": "featured_product_ids",
+    "type": "product_multi_select",
+    "description": "Featured products (homepage hero)"
+  },
+  {
+    "name": "footer_category_ids",
+    "type": "category_multi_select",
+    "description": "Categories shown in footer"
+  },
+  {
+    "name": "footer_page_ids",
+    "type": "page_multi_select",
+    "description": "Pages linked from footer"
+  },
+  {
+    "name": "hero_product_id",
+    "type": "product_single_select",
+    "description": "Single product featured above the fold"
+  },
+  {
+    "name": "promo_category_id",
+    "type": "category_single_select",
+    "description": "Category for promo banner link"
+  },
+  {
+    "name": "legal_page_id",
+    "type": "page_single_select",
+    "description": "Legal / info page linked from footer"
+  },
+  {
     "name": "hero_slides",
     "type": "object_array",
     "description": "Hero slides",
     "fields": [
+      {
+        "name": "image",
+        "type": "image",
+        "default": "",
+        "description": "Slide background image"
+      },
       {
         "name": "title",
         "type": "string",
@@ -250,6 +456,11 @@ Here is a full `schema.json` demonstrating every field type:
         "type": "boolean",
         "default": true,
         "description": "Enable this slide"
+      },
+      {
+        "name": "linked_product_ids",
+        "type": "product_multi_select",
+        "description": "Products linked from this slide"
       }
     ]
   }
@@ -300,10 +511,39 @@ The `theme_data` object is automatically injected into **every** section templat
 {% for slide in theme_data.hero_slides %}
   {% if slide.enabled %}
     <div class="slide" style="color: {{ slide.text_color }}">
+      {% if slide.image != blank %}
+        <img src="{{ slide.image }}" alt="{{ slide.title }}" />
+      {% endif %}
       <h2>{{ slide.title }}</h2>
     </div>
   {% endif %}
 {% endfor %}
+```
+
+### Entity Multi-Select and Single-Select Values (IDs)
+
+`product_multi_select`, `category_multi_select`, and `page_multi_select` are stored as a flat array of **string IDs**. `product_single_select`, `category_single_select`, and `page_single_select` are stored as a **single string ID** (or `""` if unset). Resolve them inside your template against entities already in scope, or print them and hydrate from `script.js`. See [Resolving IDs in Templates](#resolving-ids-in-templates) for the full pattern.
+
+```liquid
+{% comment %} Render the merchant's featured products in their chosen order {% endcomment %}
+<div class="featured">
+  {% for fid in theme_data.featured_product_ids %}
+    {% assign featured = products | where: "id", fid | first %}
+    {% if featured %}
+      <a href="/products/{{ featured.slug }}">{{ featured.name }}</a>
+    {% endif %}
+  {% endfor %}
+</div>
+```
+
+```liquid
+{% comment %} Single product ID — guard blank before resolving {% endcomment %}
+{% if theme_data.hero_product_id != blank %}
+  {% assign hero = products | where: "id", theme_data.hero_product_id | first %}
+  {% if hero %}
+    <a href="/products/{{ hero.slug }}">{{ hero.name }}</a>
+  {% endif %}
+{% endif %}
 ```
 
 ---
@@ -341,11 +581,30 @@ For global color values, prefer using the [Palette](./palette) system instead of
 
 ## Schema Field Reference
 
-| Property      | Required                      | Type     | Description                                                                                          |
-| ------------- | ----------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| `name`        | Yes                           | `string` | Unique key — becomes `theme_data.{name}` in Liquid                                                   |
-| `type`        | Yes                           | `string` | One of: `string`, `number`, `color`, `boolean`, `checkbox`, `select`, `multi_select`, `object_array` |
-| `description` | Yes                           | `string` | Label shown to merchants in the settings form                                                        |
-| `default`     | No                            | varies   | Default value when merchant hasn't set one                                                           |
-| `options`     | For `select` / `multi_select` | `array`  | Array of `{ label, value }` objects                                                                  |
-| `fields`      | For `object_array`            | `array`  | Array of nested field definitions (primitive, select, or multi-select only)                          |
+| Property      | Required                                                                     | Type     | Description                                                                                                                                                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`        | Yes                                                                          | `string` | Unique key — becomes `theme_data.{name}` in Liquid                                                                                                                                                                                                           |
+| `type`        | Yes                                                                          | `string` | One of: `string`, `number`, `color`, `boolean`, `checkbox`, `image`, `select`, `multi_select`, `product_multi_select`, `category_multi_select`, `page_multi_select`, `product_single_select`, `category_single_select`, `page_single_select`, `object_array` |
+| `description` | Yes                                                                          | `string` | Label shown to merchants in the settings form                                                                                                                                                                                                                |
+| `default`     | No (not allowed for entity multi-select or entity single-select field types) | varies   | Default value when merchant hasn't set one                                                                                                                                                                                                                   |
+| `options`     | For `select` / `multi_select`                                                | `array`  | Array of `{ label, value }` objects                                                                                                                                                                                                                          |
+| `fields`      | For `object_array`                                                           | `array`  | Array of nested field definitions (primitive, select, multi-select, entity multi-select, or entity single-select — no nested object arrays)                                                                                                                  |
+
+### Stored Value by Type
+
+| Type                     | Stored Value                                     | Example                                   |
+| ------------------------ | ------------------------------------------------ | ----------------------------------------- |
+| `string`                 | `string`                                         | `"Welcome"`                               |
+| `number`                 | `number`                                         | `16`                                      |
+| `color`                  | `string` (hex)                                   | `"#1A1A2E"`                               |
+| `boolean` / `checkbox`   | `boolean`                                        | `true`                                    |
+| `image`                  | `string` (URL)                                   | `"https://files.easy-orders.net/img.jpg"` |
+| `select`                 | `string` (one of `options[].value`)              | `"dark"`                                  |
+| `multi_select`           | `string[]` (subset of `options`)                 | `["sale", "new"]`                         |
+| `product_multi_select`   | `string[]` of product IDs (in merchant's order)  | `["prod_abc", "prod_xyz"]`                |
+| `category_multi_select`  | `string[]` of category IDs (in merchant's order) | `["cat_a", "cat_b"]`                      |
+| `page_multi_select`      | `string[]` of page IDs (in merchant's order)     | `["page_1", "page_2"]`                    |
+| `product_single_select`  | `string` — one product ID, or `""` if unset      | `"prod_abc"`                              |
+| `category_single_select` | `string` — one category ID, or `""` if unset     | `"cat_a"`                                 |
+| `page_single_select`     | `string` — one page ID, or `""` if unset         | `"page_1"`                                |
+| `object_array`           | `Array<Record<string, value>>`                   | `[{ "title": "…", … }, …]`                |

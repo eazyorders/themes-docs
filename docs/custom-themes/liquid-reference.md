@@ -49,6 +49,16 @@ Every section template automatically receives `theme_data` — the merchant-conf
 </h1>
 ```
 
+### Other merchant settings: `section_data` and `product_theme_data`
+
+Schema types are the same everywhere (see [Dynamic theme data](./dynamic-theme-data)), but Liquid exposes values differently:
+
+- **`section_data`** — custom homepage blocks only (`home-sections/*/config.json`).
+- **`product_theme_data`** — current product on the product detail page.
+- **`product.product_theme_data`** — each item when looping `products` in list/grid sections.
+
+See [Dynamic theme data](./dynamic-theme-data) for schema field types.
+
 ### Section-Specific Variables
 
 Each section also receives its own set of variables (documented in [Layout sections](./sections/layout-sections), [Product sections](./sections/product-sections), [Home sections](./sections/home-sections), and [Utility sections](./sections/utility-sections)). For example, `product-details.liquid` receives `product_name`, `price`, `sale_price`, `currency`, `rating`, and `reviews_count`.

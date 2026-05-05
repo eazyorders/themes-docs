@@ -733,7 +733,26 @@ The same product variable contract as the homepage product sections applies here
 | `sale` | string | Translated "Sale" label |
 | `theme_data` | object | Merchant-configured dynamic settings |
 
-**Product properties** and **variation properties** are identical to the other product sections.
+**Product properties:**
+
+| Property             | Type           | Description                                |
+| -------------------- | -------------- | ------------------------------------------ |
+| `product.id`         | string         | Product ID (used in events)                |
+| `product.name`       | string         | Product name                               |
+| `product.slug`       | string         | URL slug                                   |
+| `product.price`      | number         | Regular price                              |
+| `product.sale_price` | number \| null | Sale price                                 |
+| `product.thumb`      | string         | Main thumbnail URL                         |
+| `product.images`     | string[]       | Additional image URLs                      |
+| `product.variations` | array          | Variation groups with `type` and `props[]` |
+| `product.product_theme_data` | object         | Merchant-configured dynamic settings for each product, set on the product edit page in the Seller Dashboard |
+
+**Variation properties (for color swatches):**
+
+| Property          | Type   | Description                          |
+| ----------------- | ------ | ------------------------------------ |
+| `variation.type`  | string | `"color"` or `"image"`               |
+| `variation.props` | array  | Swatch items with `name` and `value` |
 
 ### Events
 
