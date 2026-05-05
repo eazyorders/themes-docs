@@ -351,3 +351,53 @@ The same product variable contract as the homepage product sections applies here
 :::info
 On collections pages the storefront renders a "Load more" button **outside** this template using React. Each click fetches the next page and re-renders this template with the full accumulated product list.
 :::
+
+## Custom home sections {#custom-home-sections}
+
+Optional homepage blocks you ship with the theme live under `home-sections/`. Each block is one folder whose **name you choose** when authoring the theme — it must be **unique** among folders under `home-sections/` (no two blocks may share the same folder name).
+
+Example layout:
+
+```
+my-theme/
+├── home-sections/
+│   ├── category-mosaic/          ← unique folder name (example)
+│   │   ├── config.json           ← icon, label, section_schema
+│   │   └── template.liquid       ← Liquid for this block
+│   └── shop-the-look/            ← another unique folder name (example)
+│       ├── config.json
+│       └── template.liquid
+├── schema.json                   ← global theme schema (theme_data)
+├── sections/                     ← built-in section templates (.liquid)
+├── ...
+```
+
+Every folder must contain exactly these files:
+
+- **`config.json`** — `icon`, `label`, and **`section_schema`** (field definitions; same types as in [Dynamic theme data](../dynamic-theme-data.md)).
+- **`template.liquid`** — Liquid for that block.
+
+Example `config.json`:
+
+```json
+{
+  "icon": "https://api.iconify.design/lucide:layout-grid.svg",
+  "label": "Category mosaic",
+  "section_schema": [
+    {
+      "name": "title",
+      "type": "string",
+      "default": "Shop by mood",
+      "description": "Section heading"
+    }
+  ]
+}
+```
+
+When the theme is uploaded, those folders populate the theme template’s **`home_sections`** list. Merchants add instances in the home builder; each instance’s saved values are exposed in Liquid as **`section_data`**. Global theme settings from `schema.json` are still available as **`theme_data`**.
+
+```liquid
+{% if section_data.title != blank %}
+  <h2>{{ section_data.title }}</h2>
+{% endif %}
+```
