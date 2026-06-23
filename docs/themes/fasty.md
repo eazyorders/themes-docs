@@ -415,23 +415,38 @@ The card classes are used in the global fasty card component
 
 ## Global
 
-### Header
+### Default Header
 
 ```css
-.fasty_header {
-}
-
-.fasty_header_top_text {
-}
-
-.fasty_header_container {
-}
-
-.fasty_header_logo {
+.default_header {
 }
 ```
 
-![Header](./fasty-assets/fasty_header.png)
+![Header](./img/default_header.png)
+
+```css
+.default_header_top_text {
+}
+```
+
+![Header Top Text](./img/default_header_top_text.png)
+
+```css
+.default_header_container {
+}
+```
+
+![Header Container](./img/default_header_container.png)
+
+```css
+.default_header_logo {
+}
+```
+
+![Header Logo](./img/default_header_logo.png)
+
+### Sphinx Header
+
 
 ### Footer
 
