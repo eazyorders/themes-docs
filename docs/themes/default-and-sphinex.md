@@ -169,11 +169,10 @@ sidebar_position: 2
 ### Total shipping cost
 
 ```css
-.total_shipping_container {
-}
-
+/* اخفاء كلمة "تكلفة الشحن" */
+.total_shipping_container,
 .total_shipping {
-}
+    display: none !important;
 ```
 
 ![Total Shipping](./img/shipping_cost.png)
@@ -181,10 +180,11 @@ sidebar_position: 2
 ### Total price
 
 ```css
-.total_price_container {
-}
-
-.total_price {
+.total_price_container::after {
+    content: "السعر شامل تكلفة الشحن";
+    display: inline-block;
+    font-weight: bold;
+    color: #000;
 }
 ```
 
