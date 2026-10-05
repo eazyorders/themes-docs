@@ -148,6 +148,27 @@ body {
   font-weight: 500;
 }
 
+div[class*='navbarSearchContainer'] {
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 997px) {
+  div[class*='navbarSearchContainer'] {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 996px) {
+  div[class*='navbarSearchContainer'] {
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: var(--ifm-navbar-height);
+    padding: 0;
+  }
+}
+
 
 /* ── Sidebar ─────────────────────────────────────────────────────────── */
 
