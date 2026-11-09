@@ -79,7 +79,7 @@ See [Per-product theme data](./dynamic-theme-data#per-product-theme-data-product
 
 ### Section-specific variables
 
-Each section also receives its own set of variables (documented in [Layout sections](./sections/layout-sections), [Product sections](./sections/product-sections), [Home sections](./sections/home-sections), and [Utility sections](./sections/utility-sections)). For example, `product-details.liquid` receives `product_name`, `price`, `sale_price`, `currency`, `rating`, and `reviews_count`.
+Each section also receives its own set of variables (documented in [Layout sections](./sections/layout-sections), [Product sections](./sections/product-sections), [Home sections](./sections/home-sections), [Utility sections](./sections/utility-sections), and [Blog sections](./sections/blog-sections)). For example, `product-details.liquid` receives `product_name`, `price`, `sale_price`, `currency`, `rating`, and `reviews_count`.
 
 ### Assigning Variables
 
