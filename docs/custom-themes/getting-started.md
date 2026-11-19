@@ -19,7 +19,7 @@ Every custom theme follows this exact folder layout:
 
 ```
 my-theme/
-├── sections/                    ← 20 built-in section templates
+├── sections/                    ← 24 built-in section templates
 │   ├── header.liquid
 │   ├── footer.liquid
 │   ├── gallery.liquid
@@ -39,7 +39,11 @@ my-theme/
 │   ├── breadcrumbs.liquid
 │   ├── fixed-buy-button.liquid
 │   ├── thanks.liquid
-│   └── order-invoice.liquid
+│   ├── order-invoice.liquid
+│   ├── blog-header.liquid
+│   ├── blog-latest.liquid
+│   ├── blog-grid.liquid
+│   └── blog-post.liquid
 ├── home-sections/               ← optional custom homepage blocks (see Home sections)
 │   └── category-mosaic/
 │       ├── config.json
@@ -78,6 +82,10 @@ When you upload a theme folder, each file maps to a specific field:
 | `sections/fixed-buy-button.liquid`    | `fixed_buy_button`    | Section | Sticky buy bar                        |
 | `sections/thanks.liquid`              | `thanks`              | Section | Thank-you page                        |
 | `sections/order-invoice.liquid`       | `order_invoice`       | Section | Order invoice view                    |
+| `sections/blog-header.liquid`         | `blog_header`         | Section | Blog listing title and subtitle header |
+| `sections/blog-latest.liquid`         | `blog_latest`         | Section | Featured / latest article on listing page |
+| `sections/blog-grid.liquid`           | `blog_grid`           | Section | Articles card grid on listing page     |
+| `sections/blog-post.liquid`           | `blog_post`           | Section | Full article page with related posts  |
 | `style.css`                           | `theme_style`         | Asset   | Global CSS (minified on upload)       |
 | `script.js`                           | `theme_script`        | Asset   | Global JS (minified on upload)        |
 | `schema.json`                         | `theme_data_schema`   | Schema  | Global dynamic settings schema        |
